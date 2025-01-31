@@ -163,7 +163,7 @@ namespace PayrollLibTests
         [TestMethod]
         public void CalculateSalary_InvalidExperience_ThrowsArgumentException()
         {
-            var employee = new Employee("John", "Doe", 1, "Δίκτυα", "Junior Developer", -2, 1000);
+            var employee = new Employee("Jim", "Skoufis", 1, "Δίκτυα", "Junior Developer", -2, 1000);
             double annualGrossSalary = 0, netAnnualIncome = 0, netMonthIncome = 0, tax = 0, insurance = 0;
 
             Console.WriteLine("Testing CalculateSalary with negative experience...");
@@ -180,9 +180,9 @@ namespace PayrollLibTests
         {
             Employee[] employees =
             {
-        new Employee("John", "Doe", 1, "Δίκτυα", "Mid-level Developer", 5, 1000),
-        new Employee("Jane", "Smith", 2, "Δίκτυα", "Mid-level Developer", 3, 1200),
-        new Employee("Jack", "Brown", 0, "Δίκτυα", "Senior Developer", 10, 2000)
+        new Employee("Jim", "Skoufis", 1, "Δίκτυα", "Mid-level Developer", 5, 1000),
+        new Employee("Sofia", "Malouni", 2, "Δίκτυα", "Mid-level Developer", 3, 1200),
+        new Employee("Makis", "Anastasopoulos", 0, "Δίκτυα", "Senior Developer", 10, 2000)
     };
             int count = payrollLib.NumofEmployees(employees, "Mid-level Developer");
             Console.WriteLine($"NumofEmployees Count: {count}");
@@ -200,7 +200,7 @@ namespace PayrollLibTests
         [TestMethod]
         public void CalculateSalary_ValidData_CalculatesCorrectly()
         {
-            var employee = new Employee("John", "Doe", 1, "Δίκτυα", "Mid-level Developer", 5, 1000);
+            var employee = new Employee("Dimitrios", "Skoufis", 1, "Δίκτυα", "Mid-level Developer", 5, 1000);
             double annualGrossSalary = 0, netAnnualIncome = 0, netMonthIncome = 0, tax = 0, insurance = 0;
             payrollLib.CalculateSalary(employee, ref annualGrossSalary, ref netAnnualIncome, ref netMonthIncome, ref tax, ref insurance);
             Console.WriteLine($"Salary Calculation - Gross: {annualGrossSalary}, Net: {netAnnualIncome}, Tax: {tax}, Insurance: {insurance}");
@@ -214,11 +214,12 @@ namespace PayrollLibTests
         {
             Employee[] employees =
             {
-        new Employee("John", "Doe", 1, "Δίκτυα", "Mid-level Developer", 5, 30000),
-        new Employee("Jane", "Smith", 2, "Δίκτυα", "Mid-level Developer", 3, 31000)
-    };
+                new Employee("Jim", "Skoufis", 1, "Δίκτυα", "Mid-level Developer", 5, 30000),
+                new Employee("Sofia", "Malouni", 2, "Δίκτυα", "Mid-level Developer", 3, 31000),
+                new Employee("Makis", "Anastasopoulos", 0, "Δίκτυα", "Senior Developer", 10, 39000)
+            };
             bool result = payrollLib.GetBonus(ref employees, "Δίκτυα", 50000, 5000);
-            Console.WriteLine($"GetBonus: {result}, Employee 1 Bonus: {employees[0].Bonus}, Employee 2 Bonus: {employees[1].Bonus}");
+            Console.WriteLine($"GetBonus: {result}, Employee 1 Bonus: {employees[0].Bonus}, Employee 2 Bonus: {employees[1].Bonus}, Employee 3 Bonus: {employees[2].Bonus}");
             Assert.IsTrue(result);
         }
 
@@ -227,9 +228,10 @@ namespace PayrollLibTests
         {
             Employee[] employees =
             {
-        new Employee("John", "Doe", 1, "Δίκτυα", "Mid-level Developer", 5, 20000),
-        new Employee("Jane", "Smith", 2, "Δίκτυα", "Mid-level Developer", 3, 15000)
-    };
+                new Employee("Jim", "Skoufis", 1, "Δίκτυα", "Mid-level Developer", 5, 20000),
+                new Employee("Sofia", "Malouni", 2, "Δίκτυα", "Mid-level Developer", 3, 15000),
+                new Employee("Makis", "Anastasopoulos", 0, "Δίκτυα", "Senior Developer", 10, 5000)
+            };
             bool result = payrollLib.GetBonus(ref employees, "Δίκτυα", 50000, 5000);
             Console.WriteLine($"GetBonus: {result}");
             Assert.IsFalse(result);
@@ -240,13 +242,15 @@ namespace PayrollLibTests
         {
             Employee[] employees =
             {
-        new Employee("John", "Doe", 1, "Δίκτυα", "Mid-level Developer", 5, 0),
-        new Employee("Jane", "Smith", 2, "Δίκτυα", "Mid-level Developer", 3, 0)
+        new Employee("Jim", "Skoufis", 1, "Δίκτυα", "Mid-level Developer", 5, 0),
+        new Employee("Sofia", "Malouni", 2, "Δίκτυα", "Mid-level Developer", 3, 0),
+        new Employee("Makis", "Anastasopoulos", 0, "Δίκτυα", "Senior Developer", 10, 0)
     };
             bool result = payrollLib.GetBonus(ref employees, "Δίκτυα", 50000, 5000);
             Console.WriteLine($"GetBonus: {result}");
             Assert.IsFalse(result);
         }
+
 
     }
 }
