@@ -1,20 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace PayrollLib
 {
     public struct Employee
     {
-        // Βασικά Πεδία
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Children { get; set; }
-        public string Department { get; set; } // Δημόσια Έργα, Τραπεζικά Έργα, Δίκτυα
-        public string Position { get; set; } // Junior Developer, Mid-level Developer, Senior Developer, IT Manager
-        public int WorkExperience { get; set; } // Από 0 έως 38 έτη
-        public int Income { get; set; } // Έσοδα από συμμετοχή σε έργα
-        public double Bonus { get; set; } // Μπόνους επίδοσης
+        public string Department { get; set; }
+        public string Position { get; set; }
+        public int WorkExperience { get; set; }
+        public int Income { get; set; }
+        public double Bonus { get; set; }
 
-        // Κατασκευαστής για αρχικοποίηση
         public Employee(string firstName, string lastName, int children, string department, string position, int workExperience, int income, double bonus = 0)
         {
             FirstName = firstName;
@@ -30,7 +30,14 @@ namespace PayrollLib
 
     public class PayrollLib
     {
-        // Μέθοδος για έλεγχο τηλεφώνου
+        private List<string> errorLog = new List<string>();
+
+        private void LogError(string message)
+        {
+            errorLog.Add(message);
+            File.AppendAllText("error_log.txt", message + "\n");
+        }
+
         public bool CheckPhone(string phone, ref string phoneCountry)
         {
             if (phone.StartsWith("+30") || phone.StartsWith("0030"))
@@ -54,47 +61,43 @@ namespace PayrollLib
                 return true;
             }
             phoneCountry = "";
+            LogError("Invalid phone number: " + phone);
             return false;
         }
 
-        // Μέθοδος για έλεγχο IBAN
         public bool CheckIBAN(string iban, ref string ibanCountry)
         {
-            if (iban.StartsWith("GR"))
+            if (iban.Length < 15 || iban.Length > 34)
             {
-                ibanCountry = "Ελλάδα";
-                return true;
+                LogError("Invalid IBAN length: " + iban);
+                return false;
             }
-            else if (iban.StartsWith("CY"))
+
+            if (iban.StartsWith("GR")) ibanCountry = "Ελλάδα";
+            else if (iban.StartsWith("CY")) ibanCountry = "Κύπρος";
+            else if (iban.StartsWith("IT")) ibanCountry = "Ιταλία";
+            else if (iban.StartsWith("GB")) ibanCountry = "Αγγλία";
+            else
             {
-                ibanCountry = "Κύπρος";
-                return true;
+                LogError("Unknown IBAN country: " + iban);
+                ibanCountry = "";
+                return false;
             }
-            else if (iban.StartsWith("IT"))
-            {
-                ibanCountry = "Ιταλία";
-                return true;
-            }
-            else if (iban.StartsWith("GB"))
-            {
-                ibanCountry = "Αγγλία";
-                return true;
-            }
-            ibanCountry = "";
-            return false;
+            return true;
         }
 
-        // Μέθοδος για έλεγχο ΤΚ Ιταλίας
         public bool CheckZipCode(int zipCode)
         {
-            // Προσάρμοσε την υλοποίηση ανάλογα με τον κατάλογο των ΤΚ της Ιταλίας
-            return zipCode >= 1000 && zipCode <= 99999; // Απλοποιημένη υλοποίηση
+            if (zipCode < 1000 || zipCode > 99999)
+            {
+                LogError("Invalid Italian ZIP Code: " + zipCode);
+                return false;
+            }
+            return true;
         }
 
-        // Μέθοδος για υπολογισμό μισθού
         public void CalculateSalary(Employee empl, ref double annualGrossSalary, ref double netAnnualIncome, ref double netMonthIncome, ref double tax, ref double insurance)
         {
-            // Απλοποιημένη υλοποίηση με βάση τον βασικό μισθό ανά θέση εργασίας
             double baseSalary = empl.Position switch
             {
                 "Junior Developer" => 1200,
@@ -104,22 +107,26 @@ namespace PayrollLib
                 _ => 0
             };
 
-            // Προσαύξηση μισθού βάσει προϋπηρεσίας
             baseSalary += baseSalary * 0.03 * empl.WorkExperience;
-
-            // Υπολογισμός ετήσιων μικτών αποδοχών
             annualGrossSalary = baseSalary * 12;
+            insurance = annualGrossSalary * 0.13867;
+            double taxableIncome = annualGrossSalary - insurance;
 
-            // Υπολογισμός φόρου και ασφαλιστικών εισφορών
-            tax = annualGrossSalary * 0.2; // Π.χ., 20% φόρος
-            insurance = annualGrossSalary * 0.1; // Π.χ., 10% ασφαλιστικές εισφορές
+            if (taxableIncome <= 10000)
+                tax = taxableIncome * 0.09;
+            else if (taxableIncome <= 20000)
+                tax = 900 + (taxableIncome - 10000) * 0.22;
+            else if (taxableIncome <= 30000)
+                tax = 3100 + (taxableIncome - 20000) * 0.28;
+            else if (taxableIncome <= 40000)
+                tax = 5900 + (taxableIncome - 30000) * 0.36;
+            else
+                tax = 9500 + (taxableIncome - 40000) * 0.44;
 
-            // Υπολογισμός καθαρών αποδοχών
-            netAnnualIncome = annualGrossSalary - tax - insurance;
+            netAnnualIncome = taxableIncome - tax;
             netMonthIncome = netAnnualIncome / 12;
         }
 
-        // Μέθοδος για πλήθος υπαλλήλων σε συγκεκριμένη θέση εργασίας
         public int NumofEmployees(Employee[] empls, string position)
         {
             int count = 0;
@@ -133,7 +140,6 @@ namespace PayrollLib
             return count;
         }
 
-        // Μέθοδος για υπολογισμό μπόνους επίδοσης
         public bool GetBonus(ref Employee[] empls, string department, double incomeGoal, double bonus)
         {
             double totalIncome = 0;
@@ -151,14 +157,15 @@ namespace PayrollLib
                 {
                     if (empls[i].Department == department)
                     {
-                        Employee emp = empls[i];
-                        emp.Bonus = (emp.Income / totalIncome) * bonus;
-                        empls[i] = emp;
+                        empls[i].Bonus = (empls[i].Income / totalIncome) * bonus;
                     }
                 }
                 return true;
             }
+
+            LogError("Department " + department + " did not reach income goal.");
             return false;
         }
+
     }
 }
