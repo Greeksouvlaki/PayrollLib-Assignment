@@ -98,6 +98,11 @@ namespace PayrollLib
 
         public void CalculateSalary(Employee empl, ref double annualGrossSalary, ref double netAnnualIncome, ref double netMonthIncome, ref double tax, ref double insurance)
         {
+            if (empl.WorkExperience < 0)
+            {
+                throw new ArgumentException("Η προϋπηρεσία δεν μπορεί να είναι αρνητική.", nameof(empl.WorkExperience));
+            }
+
             double baseSalary = empl.Position switch
             {
                 "Junior Developer" => 1200,
@@ -108,6 +113,7 @@ namespace PayrollLib
             };
 
             baseSalary += baseSalary * 0.03 * empl.WorkExperience;
+
             annualGrossSalary = baseSalary * 12;
             insurance = annualGrossSalary * 0.13867;
             double taxableIncome = annualGrossSalary - insurance;
@@ -127,8 +133,12 @@ namespace PayrollLib
             netMonthIncome = netAnnualIncome / 12;
         }
 
+
         public int NumofEmployees(Employee[] empls, string position)
         {
+            if (empls == null)
+                throw new ArgumentNullException(nameof(empls), "Η λίστα υπαλλήλων δεν μπορεί να είναι null");
+
             int count = 0;
             foreach (var emp in empls)
             {
@@ -139,6 +149,7 @@ namespace PayrollLib
             }
             return count;
         }
+
 
         public bool GetBonus(ref Employee[] empls, string department, double incomeGoal, double bonus)
         {
