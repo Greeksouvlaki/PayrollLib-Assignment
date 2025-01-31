@@ -77,6 +77,17 @@ namespace PayrollLibTests
             Assert.AreEqual("", phoneCountry);
         }
 
+        [TestMethod]
+        public void CheckPhone_InvalidFormat_ReturnsFalse()
+        {
+            string phoneCountry = "";
+            bool result = payrollLib.CheckPhone("306911234567", ref phoneCountry);
+            Console.WriteLine($"CheckPhone: {result}, Country: {phoneCountry}");
+            Assert.IsFalse(result);
+            Assert.AreEqual("", phoneCountry);
+        }
+
+
 
         // CheckIBAN Tests
 
@@ -109,6 +120,17 @@ namespace PayrollLibTests
             if (result) Assert.Fail("Η συνάρτηση επέστρεψε true για άκυρο IBAN μήκους 4 χαρακτήρων!");
             Assert.AreEqual("", ibanCountry);
         }
+
+        [TestMethod]
+        public void CheckIBAN_InvalidCountryCode_ReturnsFalse()
+        {
+            string ibanCountry = "";
+            bool result = payrollLib.CheckIBAN("FR761111900069410000AA33222", ref ibanCountry);
+            Console.WriteLine($"CheckIBAN: {result}, Country: {ibanCountry}");
+            Assert.IsFalse(result);
+            Assert.AreEqual("", ibanCountry);
+        }
+
 
         // CheckZipCode Tests
 
@@ -212,5 +234,19 @@ namespace PayrollLibTests
             Console.WriteLine($"GetBonus: {result}");
             Assert.IsFalse(result);
         }
+
+        [TestMethod]
+        public void GetBonus_ZeroIncome_ReturnsFalse()
+        {
+            Employee[] employees =
+            {
+        new Employee("John", "Doe", 1, "Δίκτυα", "Mid-level Developer", 5, 0),
+        new Employee("Jane", "Smith", 2, "Δίκτυα", "Mid-level Developer", 3, 0)
+    };
+            bool result = payrollLib.GetBonus(ref employees, "Δίκτυα", 50000, 5000);
+            Console.WriteLine($"GetBonus: {result}");
+            Assert.IsFalse(result);
+        }
+
     }
 }
